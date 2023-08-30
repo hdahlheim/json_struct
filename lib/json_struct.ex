@@ -34,8 +34,8 @@ defmodule JsonStruct do
 
   defmacro field(name, opts \\ []) do
     json_name = Keyword.get(opts, :json, Atom.to_string(name))
-    encoder = Macro.escape(Keyword.get(opts,:encode, &Function.identity/1))
-    decoder = Macro.escape(Keyword.get(opts,:decode, &Function.identity/1))
+    encoder = Macro.escape(Keyword.get(opts, :encode, &Function.identity/1))
+    decoder = Macro.escape(Keyword.get(opts, :decode, &Function.identity/1))
     optional = Keyword.get(opts, :optional, false)
 
     quote bind_quoted: [name: name, optional: optional, json_name: json_name, encoder: encoder, decoder: decoder] do
@@ -72,7 +72,7 @@ defmodule JsonStruct do
             key_value_to_field(k, v)
           end
 
-        struct(__MODULE__, attrs)
+        struct!(__MODULE__, attrs)
       end
 
       def to_string_map(value) do
