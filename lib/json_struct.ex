@@ -13,11 +13,13 @@ defmodule JsonStruct do
 
     case opts[:module] do
       nil ->
-        impl_ast = JsonStruct.__impl_encoder__(__CALLER__.module)
-        quote do
-          unquote(ast)
-          unquote(impl_ast)
-        end
+        (fn () ->
+          impl_ast = JsonStruct.__impl_encoder__(__CALLER__.module)
+          quote do
+            unquote(ast)
+            unquote(impl_ast)
+          end
+        end).()
 
       module ->
         impl_ast = JsonStruct.__impl_encoder__(module)
@@ -31,16 +33,15 @@ defmodule JsonStruct do
   end
 
   defmacro field(name, opts \\ []) do
-    json_name = opts[:json] || Atom.to_string(name)
-    encoder = Macro.escape(opts[:encode] || &Function.identity/1)
-    decoder = Macro.escape(opts[:decode] || &Function.identity/1)
-    optional = opts[:optional]
+    json_name = Keyword.get(opts, :json, Atom.to_string(name))
+    encoder = Macro.escape(Keyword.get(opts,:encode, &Function.identity/1))
+    decoder = Macro.escape(Keyword.get(opts,:decode, &Function.identity/1))
+    optional = Keyword.get(opts, :optional, false)
+
     quote bind_quoted: [name: name, optional: optional, json_name: json_name, encoder: encoder, decoder: decoder] do
       @json_struct_fields name
       @json_keys json_name
-      if optional do
       @json_optional_fields name
-      end
 
       defp field_to_key_value(unquote(name), value) do
         {unquote(json_name), unquote(encoder).(value)}
@@ -49,6 +50,8 @@ defmodule JsonStruct do
       defp key_value_to_field(unquote(json_name), value) do
         {unquote(name), unquote(decoder).(value)}
       end
+
+      defp omit_empty({unquote(name), v}) when is_nil(v), do: unquote(optional)
     end
   end
 
@@ -83,7 +86,6 @@ defmodule JsonStruct do
         end
       end
 
-      defp omit_empty({k, v}) when k in @json_optional_fields and is_nil(v), do: true
       defp omit_empty(_), do: false
     end
   end
