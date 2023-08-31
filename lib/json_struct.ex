@@ -1,7 +1,10 @@
 defmodule JsonStruct do
-  @moduledoc """
-  Documentation for `JsonStruct`.
-  """
+  @external_resource "README.md"
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- @moduledoc -->")
+             |> Enum.fetch!(1)
+
   defmacro __using__(_opts) do
     quote do
       import JsonStruct, only: [json_struct: 1, json_struct: 2]

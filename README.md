@@ -1,6 +1,30 @@
 # JsonStruct
 
-**TODO: Add description**
+<!-- @moduledoc -->
+
+JsonStruct is a elixir libary that takes care of implementing the Jason.Encoder Protocol for a
+struct.
+
+It also allows for easy renaming of keys and gives you the option to add your own
+encoding decoding function for each field.
+
+```elixir
+defmodule Message do
+  use JsonStruct
+
+  json_struct do
+    field :to, json: "to"
+    field :id, json: "msgId"
+
+    field :message,
+      json: "msg",
+      encode: &String.upcase/1,
+      decode: &String.downcase/1
+  end
+end
+msg = %Message{id: "abcd", to: "José", message: "I love Elixir!"} |> Jason.encode!()
+msg == ~s|{"msg":"I LOVE ELIXIR!","msgId":"abcd","to":"José"}|
+```
 
 ## Installation
 
