@@ -13,20 +13,23 @@ defmodule JsonStruct do
 
     case opts[:module] do
       nil ->
-        (fn () ->
-          impl_ast = JsonStruct.__impl_encoder__(__CALLER__.module)
-          quote do
-            unquote(ast)
-            unquote(impl_ast)
-          end
-        end).()
+        impl_ast = JsonStruct.__impl_encoder__(__CALLER__.module)
+
+        quote do
+          (fn ->
+             unquote(ast)
+             unquote(impl_ast)
+           end).()
+        end
 
       module ->
         impl_ast = JsonStruct.__impl_encoder__(module)
+
         quote do
           defmodule unquote(module) do
             unquote(ast)
           end
+
           unquote(impl_ast)
         end
     end
@@ -38,10 +41,15 @@ defmodule JsonStruct do
     decoder = Macro.escape(Keyword.get(opts, :decode, &Function.identity/1))
     optional = Keyword.get(opts, :optional, false)
 
-    quote bind_quoted: [name: name, optional: optional, json_name: json_name, encoder: encoder, decoder: decoder] do
+    quote bind_quoted: [
+            name: name,
+            optional: optional,
+            json_name: json_name,
+            encoder: encoder,
+            decoder: decoder
+          ] do
       @json_struct_fields name
       @json_keys json_name
-      @json_optional_fields name
 
       defp field_to_key_value(unquote(name), value) do
         {unquote(json_name), unquote(encoder).(value)}
@@ -60,7 +68,6 @@ defmodule JsonStruct do
       import JsonStruct
       Module.register_attribute(__MODULE__, :json_keys, accumulate: true)
       Module.register_attribute(__MODULE__, :json_struct_fields, accumulate: true)
-      Module.register_attribute(__MODULE__, :json_optional_fields, accumulate: true)
 
       unquote(block)
 
@@ -75,7 +82,7 @@ defmodule JsonStruct do
         struct!(__MODULE__, attrs)
       end
 
-      def to_string_map(value) do
+      def to_string_map(%__MODULE__{} = value) do
         values =
           value
           |> Map.from_struct()
@@ -86,6 +93,9 @@ defmodule JsonStruct do
         end
       end
 
+      # prevent compiler errors if no field is provided
+      defp field_to_key_value(k, v), do: {k, v}
+      defp key_value_to_field(k, v), do: {k, v}
       defp omit_empty(_), do: false
     end
   end

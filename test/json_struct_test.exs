@@ -7,6 +7,7 @@ defmodule JsonStructTest do
 
     json_struct do
       field :to
+
       field :content,
         json: "c",
         optional: true,
@@ -20,12 +21,12 @@ defmodule JsonStructTest do
 
     json = Jason.encode!(msg)
     assert ~s|{"c":"aGk=","to":"Jen"}| == json
-    assert msg == Jason.decode!(json) |> Message.from_string_map
+    assert msg == Jason.decode!(json) |> Message.from_string_map()
 
     msg = %Message{content: "no name"}
 
     json = Jason.encode!(msg)
     assert ~s|{"c":"bm8gbmFtZQ==","to":null}| == json
-    assert msg == Jason.decode!(json) |> Message.from_string_map
+    assert msg == Jason.decode!(json) |> Message.from_string_map()
   end
 end
