@@ -2,11 +2,11 @@
 
 <!-- @moduledoc -->
 
-JsonStruct is a elixir libary that takes care of implementing the Jason.Encoder Protocol for a
+JsonStruct is a elixir library that takes care of implementing the Jason.Encoder Protocol for a
 struct.
 
 It also allows for easy renaming of keys and gives you the option to add your own
-encoding decoding function for each field.
+encoding/decoding function for each field.
 
 ```elixir
 defmodule Message do
