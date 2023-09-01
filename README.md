@@ -43,3 +43,7 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/json_struct>.
 
+## Inspiration
+
+The library is inspired by Go struct tags and the rename field attribute of [serde](https://github.com/serde-rs/serde).
+The basic structure of the macro is inspired by [ejpcmac/type_struct](https://github.com/ejpcmac/typed_struct).
